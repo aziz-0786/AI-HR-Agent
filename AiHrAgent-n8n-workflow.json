@@ -1,0 +1,159 @@
+{
+  "name": "AiHrAgent-n8n-workflow",
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "88ac435a-67cf-4fd8-b84e-1a2356b489fb",
+      "name": "start"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6260e688-1033-40c0-abee-19e48a1e47c9",
+              "name": "candidateName",
+              "value": "Alice Smith",
+              "type": "string"
+            },
+            {
+              "id": "bc8dffa6-d192-4c47-937c-1209eb81802b",
+              "name": "candidateEmail",
+              "value": "abdulaziz99289@gmail.com",
+              "type": "string"
+            },
+            {
+              "id": "befd17dc-f9a5-4b0f-8484-3ba38a7b7f7f",
+              "name": "candidateSkills",
+              "value": "Python, SQL, Data Analysis, Basic Machine Learning, JavaScript",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        280,
+        0
+      ],
+      "id": "f9d5e575-745d-431e-a28d-23e75d983a5e",
+      "name": "Set Candidate Data"
+    },
+    {
+      "parameters": {
+        "jsCode": "const candidateName = $node[\"Set Candidate Data\"].json.candidateName;\nconst candidateSkills = $node[\"Set Candidate Data\"].json.candidateSkills;\n\nconst prompt = `You are an HR assistant. Given the following candidate's skills, suggest ONE specific online course or resource (e.g., a Coursera course, a specific book, a tutorial series) that would help them enhance their profile for a general Software Developer role, or bridge a common skill gap. Then, draft a short, encouraging email to the candidate suggesting this resource.\n\nCandidate Name: ${candidateName}\nCandidate Skills: ${candidateSkills}\n\nYour response should be ONLY the email draft, starting with \"Subject:...\" and including the suggested resource with a placeholder link. Make it friendly and professional.`;\n\nreturn [{ json: { promptString: prompt } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        540,
+        0
+      ],
+      "id": "6f1a66cd-f6bc-4aa5-a4f7-bae52f243c8a",
+      "name": "Prepare AI Prompt"
+    },
+    {
+      "parameters": {
+        "command": "=python C:\\Users\\tangy\\OneDrive\\Documents\\AiHrAgent\\llm_agent.py \"{{ $json.promptString }}\""
+      },
+      "type": "n8n-nodes-base.executeCommand",
+      "typeVersion": 1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "ec218932-6e70-40cc-ad06-d6b6fc02610a",
+      "name": "Call AI Agent"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ $node[\"Set Candidate Data\"].json.candidateEmail }}",
+        "subject": "Invitation for aptitude test(xyz company)",
+        "emailType": "text",
+        "message": "=Congratulations. you are selected for aptitude test.",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.1,
+      "position": [
+        1020,
+        0
+      ],
+      "id": "5222847b-8f89-4393-85f2-2b19e687121b",
+      "name": "Send a message",
+      "webhookId": "9e329ecc-6e5c-4466-9b5c-80d93f191b48",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "Jgh5pfp1Vj31S3TY",
+          "name": "Gmail account 2"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "start": {
+      "main": [
+        [
+          {
+            "node": "Set Candidate Data",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Set Candidate Data": {
+      "main": [
+        [
+          {
+            "node": "Prepare AI Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Prepare AI Prompt": {
+      "main": [
+        [
+          {
+            "node": "Call AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send a message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "3a0037d8-0619-47d8-b17e-6b6c1e47c43d",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "a830a38e8de530259be024b42ff85b5c6a1e94dcd97bd23149f46c2303424b6e"
+  },
+  "id": "hzFrsbQXgkMSTpsW",
+  "tags": []
+}
